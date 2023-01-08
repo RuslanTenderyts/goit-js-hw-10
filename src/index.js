@@ -16,35 +16,26 @@ refs.countries.style.list
 refs.input.addEventListener('input', debounce(onSeacrh, DEBOUNCE_DELAY));
 
 function onSeacrh(evt) {
-    
-    // const value = evt.currentTarget.value.trim();
-    const value = refs.input.value.trim();  
+    clearCountries()
+    const value = evt.target.value.trim();
+    // const value = refs.input.value.trim();  
 
     if (!value) {
-        clearCountries();
         return;
     }
     
     fetchCountries(value)
-    .then(countries => {
-        
-        clearCountries()
-        
-        if(countries.length == 1) {
-            refs.countryInfo.innerHTML = markapOfCountry(countries);
-                console.log('information of country прапор, назва, столиця, населення і мови.')
-            }else if(countries.length > 1 && countries.length < 10) {
-                refs.countries.innerHTML = markapOfCountries(countries);
-                console.log('coutrys list')
-            }else {
-                         
-            Notify.info('Too many matches found. Please enter a more specific name.')}
-    })
+    .then(countries => markapOfCountry(countries))
     .catch(err => Notify.failure('Oops, there is no country with that name'));
    
 }
 
-function markapOfCountry(country) {
+function clearCountries() {
+    refs.countryInfo.innerHTML = ''
+    refs.countries.innerHTML = ''
+}
+
+function createMarkapOfCountry(country) {
     const markup = country.map(({
         name,
         flag,
@@ -60,13 +51,19 @@ function markapOfCountry(country) {
 
     return markup;
 }
-function markapOfCountries(countries) {
+function createMarkapOfCountries(countries) {
     const markup = countries.map(({name, flag}) => `<li><img src="${flag}" alt="flag.svc" width='30'> ${name}</li>`).join('');
 
     return markup
 }
 
-function clearCountries() {
-    refs.countryInfo.innerHTML = ''
-    refs.countries.innerHTML = ''
-}
+function markapOfCountry(countries) {
+    if(countries.length == 1) {
+            refs.countryInfo.innerHTML = createMarkapOfCountry(countries);
+            // console.log('information of country прапор, назва, столиця, населення і мови.')
+        }else if(countries.length > 1 && countries.length < 10) {
+            refs.countries.innerHTML = createMarkapOfCountries(countries);
+            // console.log('coutrys list')
+        }else {       
+            Notify.info('Too many matches found. Please enter a more specific name.')}
+};
